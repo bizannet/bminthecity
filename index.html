@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4CAF50">
+    <title>BM in the City</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #2c3e50;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header { text-align: center; padding: 20px 0; color: white; }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .events-container {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .event-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border-left: 4px solid #4CAF50;
+        }
+        .event-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+        .event-meta { font-size: 14px; color: #7f8c8d; margin-bottom: 12px; }
+        .event-price { font-size: 18px; font-weight: 700; color: #4CAF50; margin-top: 12px; }
+        .register-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .loading { text-align: center; padding: 40px 20px; color: #4CAF50; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎭 BM in the City</h1>
+        <p>Мероприятия в твоём городе</p>
+    </div>
+
+    <div class="events-container">
+        <div class="loading" id="loader">
+            <p>Загрузка...</p>
+        </div>
+        <div id="events-list" style="display:none;">
+            <div class="event-card">
+                <div class="event-title">Бизнес-завтрак: Стратегии роста</div>
+                <div class="event-meta">📅 15 февраля 2026, 09:00</div>
+                <div class="event-meta">📍 Бизнес-центр "Сити"</div>
+                <div class="event-meta">🏷️ Бизнес</div>
+                <div class="event-price">1 500 ₽</div>
+                <button class="register-btn" onclick="alert('Запись успешна!')">🎫 Записаться</button>
+            </div>
+            <div class="event-card">
+                <div class="event-title">Мастер-класс по цифровому искусству</div>
+                <div class="event-meta">📅 18 февраля 2026, 18:00</div>
+                <div class="event-meta">📍 Арт-студия "Креатив"</div>
+                <div class="event-meta">🏷️ Хобби</div>
+                <div class="event-price">800 ₽</div>
+                <button class="register-btn" onclick="alert('Запись успешна!')">🎫 Записаться</button>
+            </div>
+            <div class="event-card">
+                <div class="event-title">Функциональный тренинг</div>
+                <div class="event-meta">📅 20 февраля 2026, 08:00</div>
+                <div class="event-meta">📍 Парк "Городской"</div>
+                <div class="event-meta">🏷️ Спорт</div>
+                <div class="event-price">Бесплатно</div>
+                <button class="register-btn" onclick="alert('Запись успешна!')">🎫 Записаться</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Простая загрузка
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('events-list').style.display = 'block';
+
+            // Если запущено в Telegram WebApp
+            if (window.Telegram?.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.expand();
+                document.body.style.background = tg.backgroundColor;
+            }
+        }, 500);
+    </script>
+</body>
+</html>
