@@ -7,97 +7,498 @@
     <title>BM in the City</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f7fa;
             color: #2c3e50;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
+            padding-bottom: 80px;
         }
-        .header { text-align: center; padding: 20px 0; color: white; }
-        .header h1 { font-size: 28px; margin-bottom: 8px; }
-        .events-container {
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Categories Scroll */
+        .categories {
             background: white;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 12px 16px;
+            overflow-x: auto;
+            white-space: nowrap;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
         }
-        .event-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border-left: 4px solid #4CAF50;
+
+        .category {
+            display: inline-block;
+            background: #f0f2f5;
+            color: #7f8c8d;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-right: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .event-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
-        .event-meta { font-size: 14px; color: #7f8c8d; margin-bottom: 12px; }
-        .event-price { font-size: 18px; font-weight: 700; color: #4CAF50; margin-top: 12px; }
-        .register-btn {
+
+        .category.active {
             background: #4CAF50;
             color: white;
+            font-weight: 600;
+        }
+
+        /* Date Filter */
+        .date-filter {
+            background: white;
+            padding: 12px 16px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .date-btn {
+            background: #f0f2f5;
             border: none;
             padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-size: 14px;
             cursor: pointer;
-            width: 100%;
-            margin-top: 12px;
+            white-space: nowrap;
+            transition: all 0.2s;
         }
-        .loading { text-align: center; padding: 40px 20px; color: #4CAF50; }
+
+        .date-btn.active {
+            background: #4CAF50;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Events Grid */
+        .events-grid {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        .event-image {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            object-fit: cover;
+        }
+
+        .event-content {
+            padding: 12px;
+        }
+
+        .event-category {
+            font-size: 12px;
+            color: #4CAF50;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .event-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.3;
+        }
+
+        .event-meta {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+
+        .event-price {
+            font-size: 14px;
+            font-weight: 700;
+            color: #4CAF50;
+        }
+
+        /* Event Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .modal-meta {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .register-btn {
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .register-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        /* Footer Menu */
+        .footer-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+
+        .footer-btn {
+            background: none;
+            border: none;
+            color: #7f8c8d;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .footer-btn.active {
+            color: #4CAF50;
+            font-weight: 600;
+        }
+
+        .footer-btn i {
+            font-size: 20px;
+        }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
         <h1>🎭 BM in the City</h1>
         <p>Мероприятия в твоём городе</p>
     </div>
 
-    <div class="events-container">
-        <div class="loading" id="loader">
-            <p>Загрузка...</p>
-        </div>
-        <div id="events-list" style="display:none;">
-            <div class="event-card">
-                <div class="event-title">Бизнес-завтрак: Стратегии роста</div>
-                <div class="event-meta">📅 15 февраля 2026, 09:00</div>
-                <div class="event-meta">📍 Бизнес-центр "Сити"</div>
-                <div class="event-meta">🏷️ Бизнес</div>
-                <div class="event-price">1 500 ₽</div>
-                <button class="register-btn" onclick="alert('Запись успешна!')">🎫 Записаться</button>
+    <!-- Categories -->
+    <div class="categories">
+        <div class="category active" data-category="all">🎭 Все</div>
+        <div class="category" data-category="business">💼 Бизнес</div>
+        <div class="category" data-category="hobby">🎨 Хобби</div>
+        <div class="category" data-category="sport">💪 Спорт</div>
+        <div class="category" data-category="culture">🎭 Культура</div>
+        <div class="category" data-category="education">📚 Образование</div>
+    </div>
+
+    <!-- Date Filter -->
+    <div class="date-filter">
+        <button class="date-btn active" data-date="all">📅 Все</button>
+        <button class="date-btn" data-date="today">📅 Сегодня</button>
+        <button class="date-btn" data-date="tomorrow">📅 Завтра</button>
+        <button class="date-btn" data-date="weekend">📅 Выходные</button>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="events-grid" id="events-grid">
+        <!-- Events will be loaded here -->
+    </div>
+
+    <!-- Event Detail Modal -->
+    <div class="modal" id="event-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Название мероприятия</h3>
+                <p class="modal-meta" id="modal-meta">📅 15 февраля 2026 • 🕘 09:00</p>
             </div>
-            <div class="event-card">
-                <div class="event-title">Мастер-класс по цифровому искусству</div>
-                <div class="event-meta">📅 18 февраля 2026, 18:00</div>
-                <div class="event-meta">📍 Арт-студия "Креатив"</div>
-                <div class="event-meta">🏷️ Хобби</div>
-                <div class="event-price">800 ₽</div>
-                <button class="register-btn" onclick="alert('Запись успешна!')">🎫 Записаться</button>
-            </div>
-            <div class="event-card">
-                <div class="event-title">Функциональный тренинг</div>
-                <div class="event-meta">📅 20 февраля 2026, 08:00</div>
-                <div class="event-meta">📍 Парк "Городской"</div>
-                <div class="event-meta">🏷️ Спорт</div>
-                <div class="event-price">Бесплатно</div>
-                <button class="register-btn" onclick="alert('Запись успешна!')">🎫 Записаться</button>
+            <div class="modal-body">
+                <p class="modal-description" id="modal-description">
+                    Описание мероприятия будет здесь...
+                </p>
+                <p id="modal-location">📍 Бизнес-центр "Сити"</p>
+                <p id="modal-price" style="font-size: 18px; font-weight: 700; color: #4CAF50; margin: 16px 0;">
+                    1 500 ₽
+                </p>
+                <button class="register-btn" id="modal-register">🎫 Записаться</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Простая загрузка
-        setTimeout(() => {
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('events-list').style.display = 'block';
+    <!-- Footer Menu -->
+    <div class="footer-menu">
+        <button class="footer-btn active">
+            <i>🎭</i>
+            <span>Афиша</span>
+        </button>
+        <button class="footer-btn">
+            <i>🎫</i>
+            <span>Мои записи</span>
+        </button>
+        <button class="footer-btn">
+            <i>👤</i>
+            <span>Профиль</span>
+        </button>
+    </div>
 
-            // Если запущено в Telegram WebApp
-            if (window.Telegram?.WebApp) {
-                const tg = window.Telegram.WebApp;
-                tg.expand();
-                document.body.style.background = tg.backgroundColor;
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Test events data
+        const events = [
+            {
+                id: 1,
+                title: "Бизнес-завтрак: Стратегии роста",
+                date: "15 февраля",
+                time: "09:00",
+                category: "💼 Бизнес",
+                categoryCode: "business",
+                location: "Бизнес-центр 'Сити'",
+                description: "Приглашаем предпринимателей на обсуждение актуальных стратегий бизнес-роста. Спикеры из топовых компаний поделятся опытом и инсайтами.",
+                price: 1500,
+                image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400"
+            },
+            {
+                id: 2,
+                title: "Мастер-класс по цифровому искусству",
+                date: "18 февраля",
+                time: "18:00",
+                category: "🎨 Хобби",
+                categoryCode: "hobby",
+                location: "Арт-студия 'Креатив'",
+                description: "Погрузитесь в мир цифрового творчества! Научитесь создавать потрясающие работы в современных графических редакторах.",
+                price: 800,
+                image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400"
+            },
+            {
+                id: 3,
+                title: "Функциональный тренинг",
+                date: "20 февраля",
+                time: "08:00",
+                category: "💪 Спорт",
+                categoryCode: "sport",
+                location: "Парк 'Городской'",
+                description: "Начните день с энергии! Интенсивная тренировка под руководством профессионального тренера. Все уровни подготовки.",
+                price: 0,
+                image: "https://images.unsplash.com/photo-1571791362460-0c9e80cf5b76?w=400"
+            },
+            {
+                id: 4,
+                title: "Концерт классической музыки",
+                date: "25 февраля",
+                time: "19:00",
+                category: "🎭 Культура",
+                categoryCode: "culture",
+                location: "Филармония, Большой зал",
+                description: "Вечер классической музыки в исполнении симфонического оркестра. Программа включает произведения Чайковского и Рахманинова.",
+                price: 1200,
+                image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400"
+            },
+            {
+                id: 5,
+                title: "Воркшоп: ИИ в бизнесе",
+                date: "1 марта",
+                time: "14:00",
+                category: "📚 Образование",
+                categoryCode: "education",
+                location: "Технопарк 'Инновация'",
+                description: "Практический воркшоп по внедрению ИИ-решений в бизнес-процессы. Разберем кейсы и составим дорожную карту.",
+                price: 2500,
+                image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400"
+            },
+            {
+                id: 6,
+                title: "Сетевой марафон",
+                date: "5 марта",
+                time: "10:00",
+                category: "💼 Бизнес",
+                categoryCode: "business",
+                location: "Коворкинг 'Бизнес-Хаб'",
+                description: "Идеальная возможность найти партнеров, инвесторов и клиентов. Формат быстрых встреч с полезными контактами.",
+                price: 1000,
+                image: "https://images.unsplash.com/photo-1462833680856-7d26e3b7f297?w=400"
             }
-        }, 500);
+        ];
+
+        // Render events
+        function renderEvents(filteredEvents = events) {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = filteredEvents.map(event => {
+                const priceText = event.price === 0 ? 'Бесплатно' : `${event.price} ₽`;
+                return `
+                    <div class="event-card" onclick="showEventDetail(${event.id})">
+                        <div class="event-image"></div>
+                        <div class="event-content">
+                            <div class="event-category">${event.category}</div>
+                            <div class="event-title">${event.title}</div>
+                            <div class="event-meta">📅 ${event.date}</div>
+                            <div class="event-price">${priceText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Show event detail modal
+        function showEventDetail(eventId) {
+            const event = events.find(e => e.id === eventId);
+            if (!event) return;
+
+            document.getElementById('modal-title').textContent = event.title;
+            document.getElementById('modal-meta').textContent = `📅 ${event.date} • 🕘 ${event.time}`;
+            document.getElementById('modal-description').textContent = event.description;
+            document.getElementById('modal-location').textContent = `📍 ${event.location}`;
+
+            const priceText = event.price === 0 ? 'Бесплатно' : `${event.price} ₽`;
+            document.getElementById('modal-price').textContent = priceText;
+
+            document.getElementById('event-modal').classList.add('active');
+        }
+
+        // Close modal
+        document.getElementById('event-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('event-modal')) {
+                document.getElementById('event-modal').classList.remove('active');
+            }
+        });
+
+        // Register button
+        document.getElementById('modal-register').addEventListener('click', () => {
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.showConfirm("Вы хотите записаться на это мероприятие?", (result) => {
+                    if (result) {
+                        tg.showPopup({
+                            title: "✅ Успешно!",
+                            message: "Вы записаны! Ожидайте подтверждения от организатора.",
+                            buttons: [{type: "ok"}]
+                        });
+                    }
+                });
+            } else {
+                alert("Вы успешно записаны!");
+            }
+        });
+
+        // Category filter
+        document.querySelectorAll('.category').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const category = btn.dataset.category;
+                if (category === 'all') {
+                    renderEvents();
+                } else {
+                    renderEvents(events.filter(e => e.categoryCode === category));
+                }
+            });
+        });
+
+        // Date filter
+        document.querySelectorAll('.date-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.date-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Here you would filter by date
+                // For now, just show all events
+                renderEvents();
+            });
+        });
+
+        // Initialize
+        renderEvents();
+
+        // Telegram WebApp init
+        if (window.Telegram?.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.expand();
+        }
     </script>
 </body>
 </html>
