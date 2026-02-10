@@ -68,7 +68,7 @@
         .slider-control.left { left: 0; }
         .slider-control.right { right: 0; }
         
-        /* Recommended Section (Paid Ads) */
+        /* Recommended Section (Horizontal Scroll) */
         .recommended-section { 
             background: white; padding: 16px; margin-bottom: 16px; border-radius: 16px; 
             box-shadow: 0 2px 12px rgba(0,0,0,0.06); 
@@ -82,20 +82,25 @@
         .section-see-all { 
             font-size: 14px; color: #667eea; font-weight: 500; 
         }
-        .recommended-grid { 
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; 
+        .recommended-slider { 
+            display: flex; gap: 12px; overflow-x: auto; padding: 8px 0; scrollbar-width: thin; 
+        }
+        .recommended-slider::-webkit-scrollbar { 
+            height: 6px; 
+        }
+        .recommended-slider::-webkit-scrollbar-thumb { 
+            background: #cbd5e1; border-radius: 3px; 
+        }
+        .recommended-slider::-webkit-scrollbar-thumb:hover { 
+            background: #94a3b8; 
         }
         .recommended-card { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; 
-            overflow: hidden; padding: 16px; color: white; cursor: pointer; 
-            transition: transform 0.2s; position: relative; 
+            overflow: hidden; min-width: 200px; padding: 16px; color: white; cursor: pointer; 
+            transition: transform 0.2s; position: relative; flex-shrink: 0; 
         }
         .recommended-card:hover { 
             transform: scale(1.03); 
-        }
-        .recommended-badge { 
-            position: absolute; top: 8px; right: 8px; background: rgba(255,255,255,0.2); 
-            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; 
         }
         .recommended-title { 
             font-size: 14px; font-weight: 700; margin-bottom: 6px; display: -webkit-box; 
@@ -190,16 +195,25 @@
             font-size: 48px; margin-bottom: 16px; opacity: 0.3; 
         }
         .login-required-text { 
-            font-size: 16px; margin-bottom: 12px; 
+            font-size: 16px; margin-bottom: 20px; 
+        }
+        .login-form { 
+            display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: 0 auto; 
+        }
+        .login-input { 
+            padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 15px; 
+            transition: all 0.2s; 
+        }
+        .login-input:focus { 
+            outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); 
         }
         .login-btn { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; 
-            border: none; padding: 12px 32px; border-radius: 12px; font-size: 15px; 
+            border: none; padding: 12px; border-radius: 12px; font-size: 15px; 
             font-weight: 600; cursor: pointer; transition: all 0.2s; 
-            margin-top: 12px; 
         }
         .login-btn:hover { 
-            transform: scale(1.05); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); 
+            transform: scale(1.03); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); 
         }
     </style>
 </head>
@@ -244,26 +258,36 @@
         </div>
     </div>
     
-    <!-- Recommended Section (Paid Ads) -->
+    <!-- Recommended Section (Horizontal Scroll) -->
     <div class="recommended-section">
         <div class="section-header">
             <div class="section-title">💎 Рекомендуем</div>
             <div class="section-see-all">Все →</div>
         </div>
-        <div class="recommended-grid">
+        <div class="recommended-slider">
             <div class="recommended-card">
-                <div class="recommended-badge">Платное</div>
                 <div class="recommended-title">Бизнес-завтрак с инвесторами</div>
                 <div class="recommended-meta">📅 18 февраля</div>
                 <div class="recommended-meta">📍 Бизнес-центр</div>
                 <div class="recommended-price">2 500 ₽</div>
             </div>
             <div class="recommended-card">
-                <div class="recommended-badge">Платное</div>
                 <div class="recommended-title">Мастер-класс по инвестициям</div>
                 <div class="recommended-meta">📅 20 февраля</div>
                 <div class="recommended-meta">📍 Онлайн</div>
                 <div class="recommended-price">1 800 ₽</div>
+            </div>
+            <div class="recommended-card">
+                <div class="recommended-title">Сетевой марафон для стартапов</div>
+                <div class="recommended-meta">📅 25 февраля</div>
+                <div class="recommended-meta">📍 Коворкинг</div>
+                <div class="recommended-price">3 000 ₽</div>
+            </div>
+            <div class="recommended-card">
+                <div class="recommended-title">Воркшоп по личному бренду</div>
+                <div class="recommended-meta">📅 1 марта</div>
+                <div class="recommended-meta">📍 Студия</div>
+                <div class="recommended-price">2 200 ₽</div>
             </div>
         </div>
     </div>
@@ -291,7 +315,7 @@
 
     <!-- Footer Menu -->
     <div class="footer">
-        <button class="footer-btn active">
+        <button class="footer-btn active" id="home-btn">
             <div class="footer-icon">🎭</div>
             <span>Афиша</span>
         </button>
@@ -320,14 +344,6 @@
         // Render events
         function renderEvents(filtered = events) {
             const grid = document.getElementById('events-grid');
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="login-required">
-                    <div class="login-required-icon">🎫</div>
-                    <div class="login-required-text">Войдите в профиль для просмотра своих мероприятий</div>
-                    <button class="login-btn" onclick="openProfile()">Войти в профиль</button>
-                </div>`;
-                return;
-            }
             grid.innerHTML = filtered.map(e => `
                 <div class="event-card" onclick="showEvent(${e.id})">
                     <div class="event-image">${e.category.charAt(0)}</div>
@@ -343,8 +359,8 @@
 
         // Categories slider
         let sliderPosition = 0;
-        const sliderWidth = 200; // width + gap
-        const maxPosition = 4; // 6 categories - 2 visible
+        const sliderWidth = 200;
+        const maxPosition = 4;
         
         document.getElementById('slider-left').onclick = () => {
             if (sliderPosition > 0) {
@@ -374,38 +390,58 @@
         document.getElementById('city-select').onchange = (e) => {
             const city = e.target.value;
             console.log('Selected city:', city);
-            // Здесь будет фильтрация по городу
         };
 
         // Footer navigation
+        document.getElementById('home-btn').onclick = () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setActiveTab('home');
+        };
+
         document.getElementById('my-tickets-btn').onclick = () => {
             document.getElementById('events-grid').innerHTML = `<div class="login-required">
                 <div class="login-required-icon">🎫</div>
                 <div class="login-required-text">Войдите в профиль для просмотра своих мероприятий</div>
                 <button class="login-btn" onclick="openProfile()">Войти в профиль</button>
             </div>`;
+            setActiveTab('tickets');
         };
 
         document.getElementById('profile-btn').onclick = () => {
-            const tg = window.Telegram?.WebApp;
-            if (tg) {
-                tg.showAlert('Открываем личный кабинет...');
-                // Здесь будет переход в бот для авторизации
-            } else {
-                alert('Открываем личный кабинет...');
-            }
+            document.getElementById('events-grid').innerHTML = `<div class="login-required">
+                <div class="login-required-icon">👤</div>
+                <div class="login-required-text">Вход в личный кабинет</div>
+                <form class="login-form" onsubmit="handleLogin(event)">
+                    <input type="text" class="login-input" placeholder="Логин" required>
+                    <input type="password" class="login-input" placeholder="Пароль" required>
+                    <button type="submit" class="login-btn">Войти</button>
+                </form>
+            </div>`;
+            setActiveTab('profile');
         };
 
-        document.querySelector('.footer-btn:first-child').onclick = () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
+        function setActiveTab(tab) {
+            document.querySelectorAll('.footer-btn').forEach(btn => btn.classList.remove('active'));
+            if (tab === 'home') document.getElementById('home-btn').classList.add('active');
+            if (tab === 'tickets') document.getElementById('my-tickets-btn').classList.add('active');
+            if (tab === 'profile') document.getElementById('profile-btn').classList.add('active');
+        }
 
         function openProfile() {
+            document.getElementById('profile-btn').click();
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
             const tg = window.Telegram?.WebApp;
             if (tg) {
-                tg.showAlert('Переходим в личный кабинет...');
+                tg.showPopup({
+                    title: '✅ Успешно!',
+                    message: 'Вы вошли в личный кабинет!',
+                    buttons: [{type: 'ok'}]
+                });
             } else {
-                alert('Переходим в личный кабинет...');
+                alert('Вы вошли в личный кабинет!');
             }
         }
 
